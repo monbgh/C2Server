@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
+using System.Collections.Generic;
 using TeamServer.Models;
 using TeamServer.Services;
+using TeamServer.Models.Listeners;
+using ApiModels.Requests;
 
 namespace TeamServer.Controllers
 {
@@ -12,6 +14,8 @@ namespace TeamServer.Controllers
 
     {
         private readonly IListenerService _listeners;
+
+        private readonly IAgentService _agentService;
 
         public ListenersController(IListenerService listeners)
         {
@@ -37,8 +41,12 @@ namespace TeamServer.Controllers
         {
 
             var listener = new HttpListener(request.Name, request.BindPort);
+
+            listener.Init();
             listener.Start();
+
             _listeners.AddListener(listener);
+
             var root = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}";
             var path = $"{root}/{listener.Name}";
             return Created(path, listener);

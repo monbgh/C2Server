@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TeamServer.Models
+namespace TeamServer.Models.Listeners
 
 {
     public class HttpListener : Listener
@@ -20,9 +20,10 @@ namespace TeamServer.Models
 
         private CancellationTokenSource _tokenSource;
 
-        public HttpListener(string name, int binPort) { 
-        Name = name;
-         BindPort = binPort;
+        public HttpListener(string name, int binPort)
+        {
+            Name = name;
+            BindPort = binPort;
         }
 
         public override async Task Start()
@@ -36,14 +37,14 @@ namespace TeamServer.Models
                 });
 
             var host = hostBuildler.Build();
-            _tokenSource=new CancellationTokenSource();
+            _tokenSource = new CancellationTokenSource();
             host.RunAsync(_tokenSource.Token);
         }
         private void ConfigureServices(IServiceCollection services)
         {
 
             services.AddControllers();
-
+            services.AddSingleton(AgentService);
         }
 
         private void ConfigureApp(IApplicationBuilder app)
