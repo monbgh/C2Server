@@ -1,6 +1,5 @@
 ﻿using ApiModels.Requests;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
+using TeamServer.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Xml.Linq;
 using TeamServer.Models.Agents;
@@ -26,6 +25,10 @@ namespace TeamServer.Controllers
             var agents = _agents.GetAgents();
             return Ok(agents);
         }
+
+
+
+
         [HttpGet("{name}")]
         public IActionResult GetAgent(string name)
         {
@@ -35,6 +38,44 @@ namespace TeamServer.Controllers
             return Ok(agent);
 
         }
+
+
+
+
+
+
+        [HttpGet("{agentId}/tasks")]
+        public IActionResult GetTaskResults(string agentId, string taskId)
+        {
+            var agent = _agents.GetAgent(agentId);
+            if (agent is null) return NotFound("Agent not found ");
+
+            var results = agent.GetTaskResults();
+            return Ok(results);
+
+        }
+
+
+
+
+
+        [HttpGet("{agentId}/tasks/{taskId}")]
+        public IActionResult GetTaskResult(string agentId , string taskId)
+        {
+            var agent = _agents.GetAgent(agentId);
+            if (agent is null) return NotFound("Agent not found ");
+
+            var result =agent.GetTaskResult(taskId);
+            if (result is null) return NotFound("Task Not found");
+            return Ok(result);
+ 
+        }
+
+
+
+
+
+
         [HttpPost("{agentId}")]
         public IActionResult TaskAgent(string agentId, [FromBody] TaskAgentRequest request)
         {
@@ -45,14 +86,16 @@ namespace TeamServer.Controllers
                 Id = Guid.NewGuid().ToString(),
                 Command = request.Command,
                 Arguments = request.Arguments,
-                File = request.File,
+                File = request.File
 
             };
 
             agent.QueueTask(task);
 
             var root = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}";
-            var path = $"{root}/{listener.Name}";
+            var path = $"{root}/tasks/{task.Id}";
+
+            return Created(path, path);
         }
     }
 }
