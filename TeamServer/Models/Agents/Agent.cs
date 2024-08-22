@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿
+using System.Collections.Concurrent;
 namespace TeamServer.Models.Agents
 {
     public class Agent
@@ -9,6 +10,8 @@ namespace TeamServer.Models.Agents
 
 
         private readonly ConcurrentQueue<AgentTask> _pendingTasks = new();
+
+        private readonly List<AgentTaskResult> _taskResults = new();
         public Agent(AgentMetadata metadata)
         {
 
@@ -21,9 +24,9 @@ namespace TeamServer.Models.Agents
             
         }
 
-        public void QueueTak(AgentTask task)
+        public void QueueTask(AgentTask task)
         {
-
+           
             _pendingTasks.Enqueue(task);
         }
         public IEnumerable <AgentTask> GetPendingTask() {
@@ -39,6 +42,18 @@ namespace TeamServer.Models.Agents
 
         }
 
+        public AgentTaskResult GetTaskResult(string taskId)
+        {
+            return GetTaskResults().FirstOrDefault(r => r.Id.Equals(taskId));
 
+
+
+        }
+        public IEnumerable<AgentTaskResult> GetTaskResults()
+        { 
+            return _taskResults;
+        
+        
+        }
     }
 }
