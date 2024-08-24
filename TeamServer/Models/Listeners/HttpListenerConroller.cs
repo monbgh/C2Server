@@ -7,6 +7,7 @@ using TeamServer.Models.Agents;
 
 using TeamServer.Services;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace TeamServer.Models.Listeners
 
@@ -21,7 +22,7 @@ namespace TeamServer.Models.Listeners
         {
             _agent = agent;
         }
-        public IActionResult HandleImplant()
+        public async Task<IActionResult> HandleImplant()
         {
 
             var metadata = ExtractMetadata(HttpContext.Request.Headers);
@@ -34,6 +35,24 @@ namespace TeamServer.Models.Listeners
                 agent = new Agent(metadata);
                 _agent.AddAgent(agent);
             } ;
+
+            agent.CheckIn();
+
+            if (HttpContext.Request.Method == "POST")
+            {
+                string json;
+                using (var sr = new StreamReader(HttpContext.Request.Body))
+                { 
+                
+                 json=await sr.ReadToEndAsync();
+             
+                
+                }
+             var results = JsonConverter.DeserializeObject<IEnumerable<AgentTaskResult>>(json);
+                agent.AddTaskResults(results);
+            
+            }
+
             var tasks = agent.GetPendingTask();
             return Ok(tasks);
 
@@ -44,7 +63,7 @@ namespace TeamServer.Models.Listeners
 
                 return null;
             // Autorization: Bearer <base64>
-            encodedMetadata = encodedMetadata.ToString().Substring(0, 7);
+            encodedMetadata = encodedMetadata.ToString().Remove(0, 7);
 
             
             var json = Encoding.UTF8.GetString(Convert.FromBase64String(encodedMetadata));
