@@ -28,7 +28,7 @@ namespace Agent.Commands
                     return $"Successfullt impersonated {identity.Name}";
 
                 }
-                return $"Seccessfullt made token,but failed to impersonate ";
+                return $"Seccessfully made token,but failed to impersonate ";
 
             }
             return "failled to make token ";
