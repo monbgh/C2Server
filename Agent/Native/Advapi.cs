@@ -1,6 +1,7 @@
 ﻿using System;
-
 using System.Runtime.InteropServices;
+using System.Security.Authentication.ExtendedProtection;
+using System.Security.Principal;
 
 
 namespace Agent.Native
@@ -8,7 +9,6 @@ namespace Agent.Native
     public static  class Advapi
     {
         [DllImport("advapi32.dll")]
-     
         public static extern bool LogonUserA(
         string IpszUsername,
         string IpszDomain,
@@ -17,7 +17,32 @@ namespace Agent.Native
         LogonUserProvider dwLogonProvider,
         ref IntPtr phToken);
 
+
+
+        [DllImport("advapi32.dll")]
+        public static extern bool OpenProcessToken(
+            IntPtr ProcessHandle,
+            DesiredAccess desiredAccess,
+            out IntPtr TokenHandle);
+
+
+
+        [DllImport("advapi32.dll")]
+        public extern static bool DuplicateTokenEx(
+            IntPtr hExistingToken,
+            TokenAccessLevels dwDesiredAcces,
+            ref SECURITY_ATTRIBUTES IpTokenAttributes,
+            SecurityImpersonationLevel ImpersonationLevel,
+            TokenBindingType TokenType,
+            out IntPtr phNewtoken);
+
+
+
+
+
         [DllImport("advapi32.dll ", SetLastError = true)]
+
+
         public static extern bool ImpersonateLoggedOnUser(IntPtr hTokern);
 
         [DllImport("advapi32.dll ", SetLastError = true)]

